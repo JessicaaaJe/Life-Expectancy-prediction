@@ -1,0 +1,404 @@
+---
+title: "Life expectancy Prediction"
+date: "3/4/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Import Data 
+```{r}
+Life.Expectancy.Data <- read.csv("~/Desktop/Life Expectancy Data.csv")
+Life.Expectancy.Data_rate = subset(Life.Expectancy.Data, Adult.Mortality >= 50)
+Life.Expectancy.Data_Aids = subset(Life.Expectancy.Data, Adult.Mortality >= 50, HIV.AIDS > 0.2)
+Life.Expectancy.Data$Status<- as.factor(Life.Expectancy.Data$Status)
+```
+
+
+## EDA 
+## Draft 1
+## Life.Expectancy ~ Development Status 
+```{r}
+library(ggplot2)
+ggplot(Life.Expectancy.Data, aes(x=Status, y = Life.expectancy, fill = Status)) + 
+  geom_boxplot()+ labs(title="Figure1 Life.expectancy ~ Development Status ", 
+       x = "Development Status ", y = "Life Expectancy (in ages)")
+```
+
+## Life.expectancy ~ Adult.Mortality Rate 
+```{r}
+ggplot(Life.Expectancy.Data, aes(x=Adult.Mortality, y = Life.expectancy, color= Status)) + 
+  geom_point( )+ labs(title="Figure 2 Life.expectancy ~ Adult.Mortality Rate", 
+                      x = "Adult Mortality Rate (/1000)", y = "Life.expectancy")
+```
+
+There are two linear relationships in the graph. However, the left line shows a unnormal pattern, and there is no relationship between this unnormal pattern and the status of the country. Therefore, we choose to only keep the data with mortality rate greater than 50 / 1000. 
+
+```{r}
+ggplot(Life.Expectancy.Data_rate, aes(x=Adult.Mortality, y = Life.expectancy)) + 
+  geom_point( )+ labs(title="Figure 2 Life.expectancy ~ Adult.Mortality Rate", 
+                      x = "Adult Mortality Rate (/1000)", y = "Life.expectancy")
+```
+
+
+## Life.expectancy ~ Adult Mortality Rate (/1000)
+
+```{r}
+L2 <- lm(Life.expectancy ~ Adult.Mortality, data = Life.Expectancy.Data_rate)
+summary(L2) 
+```
+
+Draw a Residual Plot
+The condition of constant variance is met. 
+```{r}
+plot(L2$residuals ~ L2$fitted.values )
+abline(h=0) 
+```
+Draw a QQ-plot
+The condition of normality is met.
+```{r}
+qqnorm(L2$residuals) 
+qqline(L2$residuals) 
+```
+
+## Life.expectancy ~ Income composition of resources
+```{r}
+ggplot(Life.Expectancy.Data_rate, aes(x=Income.composition.of.resources , y = Life.expectancy)) + 
+  geom_point()+ labs(title="Figure 3 Life.expectancy ~ Income.composition.of.resources", 
+                     x = "Income.composition.of.resoiurces", y = "Life.expectancy")
+```
+
+```{r}
+L3 <- lm(Life.expectancy ~ Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+summary(L3)
+```
+
+Draw a Residual Plot
+The condition of constant variance is roughly met. 
+```{r}
+plot(L3$residuals ~ L3$fitted.values )
+abline(h=0) 
+```
+
+Draw a QQ-plot
+The condition of normality is met.  
+```{r}
+qqnorm(L3$residuals) 
+qqline(L3$residuals) 
+```
+
+## Life.expectancy ~ Schooling
+```{r}
+ggplot(Life.Expectancy.Data_rate, aes(x=Schooling, y = Life.expectancy)) + 
+  geom_point( )+ labs(title="Figure 4 Life.expectancy ~ Schooling", 
+                      x = "Schooling", y = "Life.expectancy")
+```
+
+```{r}
+L5 <- lm(Life.expectancy ~ Schooling, data = Life.Expectancy.Data)
+summary(L5)
+```
+
+Draw a Residual Plot
+Constant Variance is met. 
+```{r}
+plot(L5$residuals ~ L5$fitted.values )
+abline(h=0) 
+```
+
+Draw a QQ-plot
+Normality is met.  
+```{r}
+qqnorm(L5$residuals) 
+qqline(L5$residuals) 
+```
+
+## Life Expectancy ~ HIV.AIDs
+```{r}
+ggplot(Life.Expectancy.Data_rate, aes(x= log(HIV.AIDS) , y = log(Life.expectancy))) + 
+  geom_point()+ labs(title="Figure 4 log(Life.expectancy) ~ log(HIV.AIDS) ",
+       x = "log(HIV.AIDS) ", y = "log(Life Expectancy (in ages))")
+```
+
+```{r}
+L6 <- lm( log(Life.expectancy) ~ log(HIV.AIDS), data = Life.Expectancy.Data_rate)
+summary(L6)
+```
+
+```{r}
+plot(L6$residuals ~ L6$fitted.values)
+abline(h=0)
+```
+Theoretical Quantiles
+```{r}
+qqnorm(L6$residuals)
+qqline(L6$residuals)
+```
+
+## Life Expectancy ~ BMI
+```{r}
+ggplot(Life.Expectancy.Data_rate, aes(x= BMI , y = Life.expectancy)) + geom_point()+
+ labs(title="Figure 4 Life.expectancy ~ BMI ",
+     x = "BMI ", y = "Life Expectancy (in ages)")
+```
+```{r}
+L8 <- lm( log(Life.expectancy) ~ BMI, data = Life.Expectancy.Data_rate)
+summary(L8)
+```
+
+
+```{r}
+plot(L8$residuals ~ L8$fitted.values)
+abline(h=0)
+```
+
+```{r}
+ qqnorm(L8$residuals)
+qqline(L8$residuals)
+```
+
+
+
+To summarize, seven potential variables have been considered: Development status, Adult.Mortality Rate, Income composition of resources, schooling, HIV.AiDS and BMI. 
+
+There is association between the development status and Life.expectancy. Developed countries show up higher life expectancy than developing countries. There is a negative linear association between Life.expectancy and Adult.Mortality Rate. There is a positive linear association between Life.expectancy and income composition of resources. The positive linear association also exists between Life.expectancy and income compoisition. No clear relationship between Life.expectancy and HIV.AIDS, we therefore log(Life.expectancy) and form a relatively moderate linear relationship between log(Life.expectancy) and HIV.AIDS. Similarly, there is a relatively weak, but positive relationship between Life.expectancy and BMI.There is no obvious linear relationship between Hepatitis.B and Life.expecatncy, so we will not consider this variable. 
+
+
+## Fit a Multilinear Regression Model
+## Draft 2 
+
+##Test on the whether to remove Schooling. 
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + HIV.AIDS 
+             + Income.composition.of.resources, data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + HIV.AIDS 
+             + Income.composition.of.resources + Schooling, 
+             data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+```
+The test shows that the p value is larger than 0.05. It means that the probability of getting test statistics as large as ours is 72.07%. Therefore we fail to reject the null hypothesis and schooling is not statistically significant at null hypothesis. Thus we remove Schooling from the Model. 
+
+##Test to whether to remove Income.composition.of.resources
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + HIV.AIDS, 
+             data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + HIV.AIDS + 
+             Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+```
+The test shows that the p value is smaller than 0.05. It means that the probability of getting test statistics as large as ours is very small. Therefore we reject the null hypothesis and income composition of resources is statistically significant at null hypothesis. Thus we keep income composition in the Model. 
+
+##Test to whether to remove HIV.AIDS: 
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + Income.composition.of.resources, data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + HIV.AIDS + 
+             Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+```
+The test shows that the p value is larger than 0.05. It means that the probability of getting test statistics as large as ours is 20.14%. Therefore we fail to reject the null hypothesis and HIV.AIDS is not statistically significant at null hypothesis. Thus we remove HIV.AIDS from the Model. 
+
+
+##Test to whether to remove BMI: 
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + Income.composition.of.resources, 
+             data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + 
+             Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+```
+The test shows that the p value is larger than 0.05. It means that the probability of getting test statistics as large as ours is 46.85%. Therefore we fail to reject the null hypothesis and BMI is not statistically significant at null hypothesis. Thus we remove BMI from the Model. 
+
+
+##Test to whether to remove Adult.Mortality: 
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Status + Income.composition.of.resources, 
+             data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality +
+             Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+```
+The test shows that the p value is smaller than 0.05. It means that the probability of getting test statistics as large as ours is very small. Therefore we reject the null hypothesis and adult.mortality is statistically significant at null hypothesis. Thus we keep adult mortality in the Model.
+
+
+##Test to whether to remove Status: 
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Adult.Mortality + Income.composition.of.resources, 
+             data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Status + Adult.Mortality +
+             Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+```
+The test shows that the p value is larger than 0.05. It means that the probability of getting test statistics as large as ours is 63.83%. Therefore we fail to reject the null hypothesis and Status is not statistically significant at null hypothesis. Thus we remove Status from the Model. 
+
+To summarize, only predictors Adult.Mortality and Income.composition.of.resources should be included in the model. 
+
+##Find the Interaction Term 
+```{r}
+library(Matrix)
+cv <- cor(Life.Expectancy.Data_rate[,c("Life.expectancy", "Adult.Mortality",  
+                                       "Income.composition.of.resources")])
+tril(round(cv, digits = 2))
+```
+(Income.composition.of.resources, Adult.Mortality) = -0.83, therefore Income.composition.of.resources : Adult.Mortaltiy should be be included in the model as the interaction term. 
+
+## Test on the R^adjusted difference by adding a new interaction term into the model: 
+```{r}
+Model1 <- lm(log(Life.expectancy) ~ Adult.Mortality + Income.composition.of.resources, 
+             data = Life.Expectancy.Data_rate) 
+Model2 <- lm(log(Life.expectancy) ~ Adult.Mortality +
+             Income.composition.of.resources + Adult.Mortality:Income.composition.of.resources, 
+             data = Life.Expectancy.Data_rate)
+anova(Model1, Model2)
+summary(Model1)$adj.r.square
+summary(Model2)$adj.r.square
+```
+Income.composition.of.resources:Adult.Mortaltiy will include in the model. 
+
+## Final Model 
+```{r}
+final <- lm(lm(log(Life.expectancy) ~ Adult.Mortality +
+             Income.composition.of.resources + Adult.Mortality:Income.composition.of.resources, 
+             data = Life.Expectancy.Data_rate))
+summary(final)
+```
+
+
+## This is another way of fitting the best Model: 
+```{r}
+library (leaps)
+BSS <- regsubsets(log(Life.expectancy) ~ Status + Adult.Mortality + BMI + HIV.AIDS + 
+                    Income.composition.of.resources + Schooling , 
+                  data = Life.Expectancy.Data_rate)
+plot(BSS, scale = "adjr2")
+```
+
+The Best subset with the highest adjusted R squared is Adult.Mortality, HIV.Mortality, and Income.composition.of.resources. 
+
+
+## Find the Interaction Term 
+```{r}
+cv2 <- cor(Life.Expectancy.Data_rate[,c("Life.expectancy", "Adult.Mortality", "HIV.AIDS", 
+                                        "Income.composition.of.resources")])
+tril(round(cv2, digits = 2))
+```
+
+This is to check the correlation between quantitative data. 
+cor(HIV.AID, Adult.Mortality) = 0.74, so we consider an interaction term: HIV.AID * Adult.Mortality. 
+cor(Income.composition.of.resources, Adult.Mortality) = -0.83, so we consider an interation term: 
+Income.composition.of.resources * Adult.Mortality. 
+
+```{r}
+BSS2 <- regsubsets(log(Life.expectancy) ~ Adult.Mortality + HIV.AIDS + 
+                     Income.composition.of.resources + HIV.AIDS:Adult.Mortality + 
+                     Income.composition.of.resources:Adult.Mortality, 
+                   data = Life.Expectancy.Data_rate)
+plot(BSS2, scale = "adjr2")
+```
+There are three models with R^2adj = 0.93. 
+
+```{r}
+LModel1 <- lm(Life.expectancy ~ Adult.Mortality + Adult.Mortality:HIV.AIDS + 
+                Income.composition.of.resources:Adult.Mortality, data = Life.Expectancy.Data_rate)
+LModel2 <- lm(Life.expectancy ~ Adult.Mortality + Income.composition.of.resources + 
+                Adult.Mortality: HIV.AIDS +Income.composition.of.resources:Adult.Mortality, 
+              data = Life.Expectancy.Data_rate)
+LModel3 <- lm(Life.expectancy ~ Adult.Mortality + HIV.AIDS + Income.composition.of.resources + 
+                Adult.Mortality: HIV.AIDS +Income.composition.of.resources:Adult.Mortality, 
+              data = Life.Expectancy.Data_rate)
+
+
+anova(LModel1, LModel2, LModel3)
+summary(LModel1)$adj.r.square
+summary(LModel2)$adj.r.square
+summary(LModel3)$adj.r.square
+```
+We will then choose Model2. 
+
+## Final Model 
+```{r}
+final <- lm(log(Life.expectancy) ~ Adult.Mortality +Income.composition.of.resources + 
+              Adult.Mortality: HIV.AIDS +Income.composition.of.resources:Adult.Mortality, 
+            data = Life.Expectancy.Data_rate) 
+summary (final)
+```
+
+```{r}
+final2 <- lm(log(Life.expectancy) ~ Adult.Mortality +Income.composition.of.resources+
+               Income.composition.of.resources:Adult.Mortality, 
+             data = Life.Expectancy.Data_rate) 
+summary (final2)
+```
+
+```{r}
+ggplot(Life.Expectancy.Data_rate, aes(x= Adult.Mortality + Income.composition.of.resources + 
+                                        Adult.Mortality*Income.composition.of.resources, 
+                                      y = log(Life.expectancy))) + geom_point()+
+  labs(title="Figure Final log(Life.expectancy) ~ Adult.Mortality, Income.composition.of.resources",
+       x = "Adult.Mortality", y = "log(Life Expectancy (in ages))")
+```
+## Check constant variance of final2
+```{r}
+plot(final$residuals ~ final$fitted.values)
+abline(h=0)
+```
+## Check Normality of final2
+```{r}
+qqnorm(final2$residuals) 
+qqline(final2$residuals) 
+```
+
+All Conditions are checked for multilinear regression line. 
+
+## Log(Life.expectancy) = -0.0011 Adult.Mortality + 0.1994 Income.composition.of.resources +0.0005 Adult.Mortality:Income.composition.of.resources + 4.2637
+
+
+
+# Final Version
+## Final Model using nested F test
+
+## Test whether to remove adult mortality
+```{r}
+fit1 <- lm(log(Life.expectancy) ~ Adult.Mortality +Income.composition.of.resources+ 
+             Adult.Mortality:Income.composition.of.resources, data = Life.Expectancy.Data_rate )
+fit2 <- lm(log(Life.expectancy) ~ Income.composition.of.resources + 
+             Adult.Mortality:Income.composition.of.resources, data = Life.Expectancy.Data_rate)
+anova(fit2, fit1)
+```
+The p value testing adult.mortality is less than 0.05, meaning that the probability of getting a test statistics as extreme as ours is very small. Therefore, we reject the null hypothesis that adult mortality is zero. Therefore, we keep the term adult mortality in the model.
+
+## Test whether to remove income.composition.of.resources
+```{r}
+fit1 <- lm(log(Life.expectancy) ~ Adult.Mortality +Income.composition.of.resources+ 
+             Adult.Mortality:Income.composition.of.resources, data = Life.Expectancy.Data_rate )
+fit2 <- lm(log(Life.expectancy) ~ Adult.Mortality + Adult.Mortality:Income.composition.of.resources, 
+           data = Life.Expectancy.Data_rate)
+anova(fit2, fit1)
+```
+The p value testing income composition.of.resources is less than 0.05, meaning that the probability of getting a test statistics as extreme as ours is very small. Therefore, we reject the null hypothesis that income composition.of.resources is zero. Therefore, we keep the term income composition.of.resources in the model.
+
+## Test whether to remove Adult.Mortality:Income.composition.of.resources
+```{r}
+fit1 <- lm(log(Life.expectancy) ~ Adult.Mortality +Income.composition.of.resources+ 
+             Adult.Mortality:Income.composition.of.resources, data = Life.Expectancy.Data_rate )
+fit2 <- lm(log(Life.expectancy) ~ Adult.Mortality +Income.composition.of.resources, 
+           data = Life.Expectancy.Data_rate)
+anova(fit2, fit1)
+```
+The p value testing Adult.Mortality:HIV.AIDS is less than 0.05, meaning that the probability of getting a test statistics as extreme as ours is very small. Therefore, we reject the null hypothesis that Adult.Mortality:HIV.AIDS is zero. Therefore, we keep the term Adult.Mortality:HIV.AIDS in the model.
+
+##The Final model is therefore:
+Log(Life.expectancy) = -0.0011 Adult.Mortality + 0.1994 Income.composition.of.resources +0.0005 Adult.Mortality:Income.composition.of.resources + 4.2637
+
+
+## Confidence Interval and Interpreting
+```{r}
+confint(fit1, level=0.90)
+```
+Assuming no change in other predictors, we are 95% confident that adult mortality are estimated to be on the range between -0.0013 t0 -0.0008929626, income.composition.of.resources are estimated to be on the range between 0.1281 to 0.2707, Adult.Mortality:Income.composition.of.resources are estimated to be on the range between 0.00014 to 0.0008.
+
+
+
