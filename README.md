@@ -12,23 +12,31 @@ EDA is first applied on each predictor. Abnormal pattern shows up when fitting t
 
 between these two variables. We then make an accommodation on the data by removing raw data whose life expectancy is less or equal to 50 to make the data be more accurately analyzed. The new dataset name is given at the first page of the R file: Life.expectancy.rate.
 
-<img width="823" alt="Screen Shot 2023-11-18 at 3 20 24 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/c0a8e65d-6786-4ff3-bc84-117dbfdbec0f">
+
+
+<img width="736" alt="Screen Shot 2023-11-18 at 4 30 10 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/dc15c318-0e39-4292-a7b9-c8a62bfbd6f5">
+
 
 There is an association between the development status and life expectancy. Developed countries show higher life expectancy than developing countries. There is a negative linear association between life expectancy and adult mortality rate. Positive linear association exit between life expectancy and income composition of resources, between life expectancy and schooling. No clear relationship between life expectancy and HIV.AIDS. We therefore log(Life.expectancy) and form a relatively moderate linear relationship between log(life.expectancy) and BMI. There is no obvious linear relationship between Hepatitis.B and life expectancy, so we will not consider this variable in the multilinear regression line. Overall, 6 explanatory variables will be tested in the multilinear regression model: country 
 status, adult mortality rate, BMI, HIV AIDS, income composition of resources, and schooling. 
 After being clear on the 6 variables we choose to use in fitting the multilinear regression line, we run the BSS model. The response variable y in BSS should be log (life,expectancy) as from the conclusion we derived from EDA that log transformation is needed in some variables. The best fitted model has R-squared 0.93, composed of three variables - adult mortality, HIV.AIDS, income composition of resources and one intercept. 
 
-<img width="737" alt="Screen Shot 2023-11-18 at 3 21 17 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/db8f0688-76f7-4802-b142-e1299810dfc6">
+<img width="673" alt="Screen Shot 2023-11-18 at 4 30 35 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/95c60aa2-656e-4dc2-be6a-1d068457b8fb">
+
 
 These three variables are not necessarily independent of each other, so interaction is better to be checked. We draw a 4*4 matrix table on the three explanatory variables and life expectancy to see the in between correlation. 
+<img width="689" alt="Screen Shot 2023-11-18 at 4 30 58 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/33a7238a-c65f-4b67-ae14-d9723139f862">
+
+
 
 Correlation between HIV.AIDS and adult mortality is 0.74, so we consider an interaction term: HIV.AIDS : Adult.Mortality. The correlation between income composition of resources and adult mortality is -0.83. Another interaction is added: income.composition.of.resources : adult.mortality. Now, the X-es that should be putte in the new BSS model BSS2 changes to adult mortality, HIV.AIDS, income composition of resources, HIV.AIDS:Adult.Mortality, and income.composition.of.resources:adult.mortality. 
 
+<img width="846" alt="Screen Shot 2023-11-18 at 4 31 40 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/e55a31f1-b67d-4025-8e75-e2835f76f469">
 
-<img width="817" alt="Screen Shot 2023-11-18 at 3 22 07 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/6b244615-dd2c-410a-bcfe-057ddf96ac56">
+
 
 As seen from the plot of the BSS2 model drawn based on the adjusted R squared, there are three BSS models with the same high adjusted R squared: 0.93. We will then make analysis and comparison between these three models. 
-<img width="756" alt="Screen Shot 2023-11-18 at 3 22 42 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/9a57fd09-39bd-4a4e-801e-d791336a7f81">
+<img width="777" alt="Screen Shot 2023-11-18 at 4 31 58 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/abd8a7a0-4292-4762-87b1-bb3a100c3c1d">
 
 
 Model1 (Life.expectancy ~ adult.mortality + adult:Mortality: HIV.AIDS + income composition of resources : adult mortality). Model 2: (Life expectancy ~ adult.mortality + income composition of resources + adult mortality : HIV.AIDS + income.composition.of.resources + adult.mortality : HIV.AIDS + income.composition.of.resources: adult.mortality). Model3: (Life expectancy ~ adult.mortality + HIV.AIDS + income composition of resources + adult.mortality : HIV.AIDS + income composition of resources : adult mortality. We then do an analysis of variance of these three models, check the probability of the F test and adjust the R square of three models. From the analysis of the variance table, model 2 successfully rejects model2, which is then statistically significant, but model 3 does not successfully reject model2, which means the added predictor HIV.AIDS is not statistically significant. The same conclusion can be drawn by checking the adjusted R square of three models. Adj.r squared 2 > adjj.r.squared 3 > adj.r.squared 1. The best model of this data set is therefore model2. 
@@ -37,28 +45,26 @@ log(life expectancy) = -0.0011 adult mortality + 0.1994 income composition of re
 
 After fitting the final model, we check the conditions when fitting the linear regression model. The graph indicates a negative linear association between log(life expectancy) and predictors. The condition of linearity is met. 
 
-<img width="831" alt="Screen Shot 2023-11-18 at 3 24 33 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/db8a119f-f361-4520-a9c9-7f8e3671262f">
-Then, the residual plot checks the constant variance and zero mean. 
-<img width="694" alt="Screen Shot 2023-11-18 at 3 25 16 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/47d0c13b-7767-40fd-b803-2cfcc5fdad72">
+<img width="756" alt="Screen Shot 2023-11-18 at 4 32 28 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/304da7fb-393b-44de-8d02-75dc6e2730f4">
+<img width="774" alt="Screen Shot 2023-11-18 at 4 32 47 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/26c2cb27-7ca0-4ffa-8de7-1e2c9db21955">
 
 And the QQ plot checks the normality. 
-<img width="712" alt="Screen Shot 2023-11-18 at 3 25 49 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/2a13954f-bfe6-431f-8cbf-e9651abcbadb">
 
-
+<img width="696" alt="Screen Shot 2023-11-18 at 4 33 19 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/5f491526-4737-430f-b646-8a978a03e9c7">
 
 
 ## Analysis and Results
 All of our analysis is completed by using R, and the packages we used include base, datasets, ggplot2, bestglm, Matrix, and leaps. In our process of analyzing the relation between life expectancy and the potential variables, We use the BSS model to get the best fitted linear regression line. In the R file, we also show how the final model can be obtained using nested F tests on every preditors. 
    	The model we chose was as follows:
-<img width="746" alt="Screen Shot 2023-11-18 at 3 26 21 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/0d55a17e-3b01-4117-a4e6-5929069e0348">
+<img width="755" alt="Screen Shot 2023-11-18 at 4 33 37 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/59732ce6-bca9-4752-9432-7b07e093cbc0">
 
- 
 Two statistics prove why it is the best fitted model. First, of the three models we fitted in, the final model has the highest adjusted R square. And second, all the
 
 predictors in the model are statistically significant. Life expectancy is highly correlated to adult mortality and income composition of resources.  
 Speaking of the performance of our final model, we think it fits our assumption that life expectancy is affected by a number of regressors. Although we only have three predictors in our final model, we still proved in the first part that all those predictors are influencing life expectancy. We chose the best model with predictors being statistically significant.
+<img width="787" alt="Screen Shot 2023-11-18 at 4 33 55 PM" src="https://github.com/JessicaaaJe/Life-Expectancy-prediction/assets/94040700/65b85f98-b1db-4e13-882e-9cb302b27ad1">
 
-<img width="741" alt="Screen Shot 2023-11-18 at 3 27 05 AM" src="https://github.com/JessicaaaJe/R-Project/assets/94040700/1a85d7c5-6dd6-4cf1-a174-4cc906d49ea6">
+
 
 Assuming no change in other predictors, we are 95% confident that Adult Mortality is estimated to be on the range between -0.0013 to -0.000893, Income Composition of Resources is estimated to be on the range between 0.1281 to 0.2707, Adult Mortality * Income Composition of Resources is estimated to be in the range between 0.00014 to 0.0008.
 
