@@ -1,6 +1,6 @@
 # R-Project
 
-# Logistic Regression Analysis on Regular Exercise Probability
+# Exercise Regularity Prediction
 
 **Author:** Jessica Chen
 
